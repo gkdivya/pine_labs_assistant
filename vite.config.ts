@@ -29,6 +29,25 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    host: "127.0.0.1",
+    port: 5000,
+    proxy: {
+      "/query": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/business-insights": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/get-cards-data": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],

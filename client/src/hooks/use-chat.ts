@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Message } from "@shared/schema";
@@ -10,6 +10,7 @@ const generateSessionId = () => {
 
 export function useChat() {
   const [sessionId] = useState(() => generateSessionId());
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchResults, setSearchResults] = useState<Message[] | null>(null);
@@ -17,42 +18,43 @@ export function useChat() {
   
   const queryClient = useQueryClient();
 
-  // Initialize session
-  const { mutate: initSession } = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/chat/session", { sessionId });
-      return response.json();
-    },
-    onError: (error) => {
-      setError("Failed to initialize chat session. Please refresh the page.");
-    },
-  });
+  // Get merchant name from URL params
+  const merchantName = useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get('merchant') || 'IRCTC E-ticketing';
+  }, []);
 
-  // Get messages for the session
-  const { 
-    data: messages = [], 
-    isLoading, 
-    error: messagesError 
-  } = useQuery({
-    queryKey: ["/api/chat", sessionId, "messages"],
-    enabled: !!sessionId,
-  });
-
-  // Send message mutation
+  // Send message mutation using the new /query endpoint
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
       setIsTyping(true);
       setError(null);
       
-      const response = await apiRequest("POST", `/api/chat/${sessionId}/message`, {
-        content,
-        sender: "user",
+      const response = await apiRequest("POST", "/query", {
+        question: content,
+        merchant: merchantName,
       });
       return response.json();
     },
-    onSuccess: () => {
-      // Invalidate and refetch messages
-      queryClient.invalidateQueries({ queryKey: ["/api/chat", sessionId, "messages"] });
+    onSuccess: (data) => {
+      // Add user message and bot response to local state
+      const userMessage: Message = {
+        id: Date.now(),
+        content: data.question || "User message",
+        sender: "user",
+        timestamp: new Date(),
+        sessionId: sessionId,
+      };
+      
+      const botMessage: Message = {
+        id: Date.now() + 1,
+        content: data.response || "No response received",
+        sender: "bot", 
+        timestamp: new Date(),
+        sessionId: sessionId,
+      };
+      
+      setMessages(prev => [...prev, userMessage, botMessage]);
       setIsTyping(false);
     },
     onError: (error) => {
@@ -61,11 +63,14 @@ export function useChat() {
     },
   });
 
-  // Search messages mutation
+  // Search messages - simplified to search local messages
   const searchMessagesMutation = useMutation({
     mutationFn: async (query: string) => {
-      const response = await apiRequest("GET", `/api/chat/${sessionId}/search?q=${encodeURIComponent(query)}`);
-      return response.json();
+      // Search through local messages
+      const filtered = messages.filter(msg => 
+        msg.content.toLowerCase().includes(query.toLowerCase())
+      );
+      return filtered;
     },
     onSuccess: (results) => {
       setSearchResults(results);
@@ -74,18 +79,6 @@ export function useChat() {
       setError("Failed to search messages. Please try again.");
     },
   });
-
-  // Initialize session on mount
-  useEffect(() => {
-    initSession();
-  }, []);
-
-  // Handle messages error
-  useEffect(() => {
-    if (messagesError) {
-      setError("Failed to load messages. Please refresh the page.");
-    }
-  }, [messagesError]);
 
   const sendMessage = (content: string) => {
     sendMessageMutation.mutate(content);
@@ -113,7 +106,7 @@ export function useChat() {
   return {
     sessionId,
     messages,
-    isLoading,
+    isLoading: false,
     isTyping,
     sendMessage,
     searchVisible,
