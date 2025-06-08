@@ -44,15 +44,13 @@ export default function Chat() {
       
       <InsightsSection />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-hidden">
-          <ChatMessages 
-            messages={searchResults || messages}
-            isLoading={isLoading}
-            isTyping={isTyping}
-            isSearchMode={!!searchResults}
-          />
-        </div>
+      <div className="flex-1 flex flex-col min-h-0">
+        <ChatMessages 
+          messages={searchResults || messages}
+          isLoading={isLoading}
+          isTyping={isTyping}
+          isSearchMode={!!searchResults}
+        />
         
         <ChatInput 
           onSendMessage={sendMessage}

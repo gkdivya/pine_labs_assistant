@@ -57,29 +57,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get business insights from FastAPI
-  app.get("/api/insights/business", async (req, res) => {
+  // Get weekly insights
+  app.get("/api/insights/weekly", async (req, res) => {
     try {
-      // In production, this would call your FastAPI endpoint
-      // For now, providing a structured business insights text
+      // Mock data for demonstration - in production this would come from Pine Labs API or database
       const insights = {
-        insights: `Pine Labs Merchant Performance Summary:
-
-• Transaction Volume: Strong growth with 1,247 transactions completed this week
-• Revenue Performance: ₹89,650 total revenue showing healthy merchant activity
-• Payment Methods: UPI leading with highest adoption rate among customers
-• Settlement Status: All transactions processing within standard timeframes
-• Customer Engagement: 342 active customers with positive growth trend
-
-Key Recommendations:
-- Monitor UPI transaction patterns for optimization opportunities
-- Review settlement schedules to improve cash flow
-- Consider promotional campaigns during low-activity periods`
+        totalTransactions: 1247,
+        transactionChange: 12.5,
+        totalRevenue: 89650,
+        revenueChange: 8.3,
+        activeCustomers: 342,
+        customerChange: 15.2,
+        failureRate: 2.1,
+        failureChange: -0.8,
+        topPaymentMethod: "UPI",
+        averageTicket: 719
       };
       
       res.json(insights);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch business insights" });
+      res.status(500).json({ error: "Failed to fetch insights" });
     }
   });
 

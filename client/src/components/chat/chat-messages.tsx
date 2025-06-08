@@ -49,7 +49,7 @@ export default function ChatMessages({
   const showQuickReplies = messages.length <= 1 && !isSearchMode;
 
   return (
-    <div className="h-full overflow-y-auto p-4 space-y-4 chat-scroll" ref={containerRef}>
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 chat-scroll" ref={containerRef}>
       {showWelcome && (
         <>
           <MessageBubble
