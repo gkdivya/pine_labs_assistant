@@ -45,3 +45,17 @@ export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
 export type ChatSession = typeof chatSessions.$inferSelect;
+
+// Weekly insights type
+export interface WeeklyInsights {
+  totalTransactions: number;
+  transactionChange: number;
+  totalRevenue: number;
+  revenueChange: number;
+  activeCustomers: number;
+  customerChange: number;
+  failureRate: number;
+  failureChange: number;
+  topPaymentMethod: string;
+  averageTicket: number;
+}

@@ -57,6 +57,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get weekly insights
+  app.get("/api/insights/weekly", async (req, res) => {
+    try {
+      // Mock data for demonstration - in production this would come from Pine Labs API or database
+      const insights = {
+        totalTransactions: 1247,
+        transactionChange: 12.5,
+        totalRevenue: 89650,
+        revenueChange: 8.3,
+        activeCustomers: 342,
+        customerChange: 15.2,
+        failureRate: 2.1,
+        failureChange: -0.8,
+        topPaymentMethod: "UPI",
+        averageTicket: 719
+      };
+      
+      res.json(insights);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch insights" });
+    }
+  });
+
   // Send message and get AI response
   app.post("/api/chat/:sessionId/message", async (req, res) => {
     try {
