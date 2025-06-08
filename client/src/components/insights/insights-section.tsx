@@ -1,10 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign, CreditCard, Users, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import type { WeeklyInsights } from "@shared/schema";
 
-interface InsightCardProps {
+interface InsightItemProps {
   title: string;
   value: string | number;
   change?: number;
@@ -12,7 +11,7 @@ interface InsightCardProps {
   format?: 'currency' | 'percentage' | 'number';
 }
 
-function InsightCard({ title, value, change, icon, format = 'number' }: InsightCardProps) {
+function InsightItem({ title, value, change, icon, format = 'number' }: InsightItemProps) {
   const formatValue = (val: string | number) => {
     if (format === 'currency') {
       return `₹${typeof val === 'number' ? val.toLocaleString() : val}`;
@@ -27,24 +26,26 @@ function InsightCard({ title, value, change, icon, format = 'number' }: InsightC
   const isNegative = change && change < 0;
 
   return (
-    <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
+    <div className="flex items-center justify-between py-2">
+      <div className="flex items-center space-x-3">
         <div className="text-pine-blue">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-gray-900">{formatValue(value)}</div>
-        {change !== undefined && (
-          <div className="flex items-center mt-1">
-            {isPositive && <TrendingUp className="w-3 h-3 text-green-500 mr-1" />}
-            {isNegative && <TrendingDown className="w-3 h-3 text-red-500 mr-1" />}
-            <span className={`text-xs ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-500'}`}>
-              {change > 0 ? '+' : ''}{change}% from last week
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <div>
+          <p className="text-sm font-medium text-gray-900">{title}</p>
+          {change !== undefined && (
+            <div className="flex items-center mt-1">
+              {isPositive && <TrendingUp className="w-3 h-3 text-green-500 mr-1" />}
+              {isNegative && <TrendingDown className="w-3 h-3 text-red-500 mr-1" />}
+              <span className={`text-xs ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-500'}`}>
+                {change > 0 ? '+' : ''}{change}% from last week
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="text-right">
+        <div className="text-lg font-bold text-gray-900">{formatValue(value)}</div>
+      </div>
+    </div>
   );
 }
 
@@ -61,17 +62,15 @@ export default function InsightsSection() {
           <h2 className="text-lg font-semibold text-gray-900">Last Week Insights</h2>
           <p className="text-sm text-gray-500">Loading performance data...</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="bg-white border border-gray-200">
-              <CardHeader className="pb-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded animate-pulse w-24"></div>
-              </CardContent>
-            </Card>
+            <div key={i} className="flex items-center justify-between py-2">
+              <div className="flex items-center space-x-3">
+                <div className="h-5 w-5 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+              <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
+            </div>
           ))}
         </div>
       </div>
@@ -113,52 +112,43 @@ export default function InsightsSection() {
         </Badge>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <InsightCard
+      <div className="space-y-1 divide-y divide-gray-100">
+        <InsightItem
           title="Total Transactions"
           value={insights?.totalTransactions ?? 0}
           change={insights?.transactionChange}
-          icon={<CreditCard className="w-4 h-4" />}
+          icon={<CreditCard className="w-5 h-5" />}
         />
         
-        <InsightCard
+        <InsightItem
           title="Total Revenue"
           value={insights?.totalRevenue ?? 0}
           change={insights?.revenueChange}
-          icon={<DollarSign className="w-4 h-4" />}
+          icon={<DollarSign className="w-5 h-5" />}
           format="currency"
         />
         
-        <InsightCard
+        <InsightItem
           title="Active Customers"
           value={insights?.activeCustomers ?? 0}
           change={insights?.customerChange}
-          icon={<Users className="w-4 h-4" />}
+          icon={<Users className="w-5 h-5" />}
         />
         
-        <InsightCard
+        <InsightItem
           title="Failure Rate"
           value={insights?.failureRate ?? 0}
           change={insights?.failureChange}
-          icon={<AlertCircle className="w-4 h-4" />}
+          icon={<AlertCircle className="w-5 h-5" />}
           format="percentage"
         />
       </div>
       
       {insights?.topPaymentMethod && insights?.averageTicket && (
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-pine-light dark:bg-pine-light rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-pine-dark dark:text-pine-dark font-medium">Top Payment Method</span>
-              <Badge className="bg-pine-blue text-white">{insights.topPaymentMethod}</Badge>
-            </div>
-          </div>
-          
-          <div className="bg-pine-light dark:bg-pine-light rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-pine-dark dark:text-pine-dark font-medium">Average Ticket Size</span>
-              <span className="text-sm font-semibold text-pine-dark dark:text-pine-dark">₹{insights.averageTicket.toLocaleString()}</span>
-            </div>
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">Top Payment Method: <span className="font-medium text-pine-blue">{insights.topPaymentMethod}</span></span>
+            <span className="text-gray-600">Avg. Ticket: <span className="font-medium text-gray-900">₹{insights.averageTicket.toLocaleString()}</span></span>
           </div>
         </div>
       )}
