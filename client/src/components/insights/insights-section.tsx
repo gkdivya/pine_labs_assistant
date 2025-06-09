@@ -80,7 +80,7 @@ export default function InsightsSection() {
 
   if (isLoadingBusiness || isLoadingCards) {
     return (
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-white border-b border-gray-200 p-4 max-h-96 overflow-y-auto">
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Merchant Insights - {merchantName}</h2>
           <p className="text-sm text-gray-500">Loading performance data...</p>
@@ -117,7 +117,7 @@ export default function InsightsSection() {
 
   if (!businessInsights && !cardInsights) {
     return (
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-white border-b border-gray-200 p-4 max-h-96 overflow-y-auto">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Merchant Insights - {merchantName}</h2>
@@ -132,7 +132,7 @@ export default function InsightsSection() {
   }
 
   return (
-    <div className="bg-white border-b border-gray-200 p-4">
+    <div className="bg-white border-b border-gray-200 p-4 max-h-96 overflow-y-auto">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Merchant Insights - {merchantName}</h2>
@@ -184,7 +184,7 @@ export default function InsightsSection() {
               <CardTitle className="text-sm font-medium text-gray-900">Business Insights Analysis</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto">
                 {businessInsights.insights}
               </div>
             </CardContent>
